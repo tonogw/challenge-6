@@ -13,17 +13,60 @@ console.log(
 );
 
 // Mulai pengujian di bawah ini
-import * as readline from "readline";
+// import * as readline from "readline";
 
-import { addBook, listBooks, searchBook } from "./functions/bookManager";
+import { addBook, searchBook } from "./functions/bookManager";
 
-console.log(
-  "                         SIMPLE BOOK MANAGEMENT SYSTEM           TERMID: TS-2680",
-);
-console.log(
-  "================================================================================",
-);
+// Clear screen
+function clearScreen(): void {
+  process.stdout.write("\x1Bc");
+}
 
+// Move cursor
+function moveCursor(row: number, col: number): void {
+  process.stdout.write(`\x1b[${row};${col}H`);
+}
+
+// Draw screen
+function drawScreen(): void {
+  clearScreen();
+
+  moveCursor(1, 24);
+  process.stdout.write(
+    "SIMPLE BOOK MANAGEMENT SYSTEM             TERMID: TS-2680",
+  );
+
+  moveCursor(2, 1);
+  process.stdout.write(
+    "================================================================================",
+  );
+
+  moveCursor(4, 1);
+  process.stdout.write("SEARCH BOOK BY AUTHOR NAME");
+
+  moveCursor(5, 1);
+  process.stdout.write("_________________________________________");
+
+  moveCursor(7, 1);
+  process.stdout.write("AUTHOR NAME . . . . . : ");
+
+  moveCursor(20, 1);
+  process.stdout.write(
+    "PF1=Help            PF2=Main Menu          PF3=Search Book        ENTER=Continue",
+  );
+
+  // Cursor position at input field
+  moveCursor(7, 25);
+}
+
+// console.log(
+//   "                         SIMPLE BOOK MANAGEMENT SYSTEM           TERMID: TS-2680",
+// );
+// console.log(
+//   "================================================================================",
+// );
+
+// Seed data
 addBook({
   title: "Clean Code",
   author: "Robert Martin",
@@ -42,26 +85,82 @@ addBook({
   publicationYear: 2003,
 });
 
-listBooks();
+drawScreen();
 
-console.log("\nSEARCH RESULT");
-console.log("=========================================");
+process.stdin.setRawMode(true);
+process.stdin.resume();
+process.stdin.setEncoding("utf8");
 
-// searchBook("clean");
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
+let author = "";
+
+process.stdin.on("data", (key: string) => {
+  // ENTER
+  if (key === "\r") {
+    clearResultArea();
+
+    moveCursor(9, 1);
+
+    searchBook(author);
+
+    moveCursor(7, 25 + author.length);
+
+    return;
+  }
+
+  // CTRL+C
+  if (key === "\u0003") {
+    process.exit();
+  }
+
+  // Backspace
+  if (key === "\u007f") {
+    if (author.length > 0) {
+      author = author.slice(0, -1);
+
+      moveCursor(7, 25);
+
+      process.stdout.write(author + " ");
+
+      moveCursor(7, 25 + author.length);
+    }
+
+    return;
+  }
+
+  // Normaly typing
+  author += key;
+
+  process.stdout.write(key);
 });
 
-rl.question("\nAUTHOR NAME . . . . .: ", (author: string) => {
-  console.log("\nSEARCH RESULT");
-  console.log("=========================================");
+function clearResultArea(): void {
+  for (let row = 9; row <= 15; row++) {
+    moveCursor(row, 1);
 
-  searchBook(author);
-});
+    process.stdout.write(" ".repeat(80));
+  }
+}
 
-console.log(" ");
-console.log(" ");
-console.log(
-  "PF1=Help            PF2=Main Menu          PF3=Search Book        ENTER=Continue",
-);
+// listBooks();
+
+// console.log("\nSEARCH RESULT");
+// console.log("=========================================");
+
+// // searchBook("clean");
+// const rl = readline.createInterface({
+//   input: process.stdin,
+//   output: process.stdout,
+// });
+
+// rl.question("\nAUTHOR NAME . . . . .: ", (author: string) => {
+//   console.log("\nSEARCH RESULT");
+//   console.log("=========================================");
+
+//   searchBook(author);
+// });
+
+// console.log(" ");
+// console.log(" ");
+// console.log(
+//   "PF1=Help            PF2=Main Menu          PF3=Search Book        ENTER=Continue",
+// );
