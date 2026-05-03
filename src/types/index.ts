@@ -3,3 +3,9 @@
 // Petunjuk: gunakan type alias atau interface untuk mendefinisikan struktur data ini
 // Pastikan tipe data untuk setiap properti sudah sesuai dengan kebutuhan
 
+// export {}; // Biar TypeScript anggap file ini "modul" sendiri (ga bentrok nama variabel antar file)
+export interface Book {
+  title: string;
+  author: string;
+  publicationYear: number;
+}
