@@ -33,44 +33,30 @@ function moveCursor(row: number, col: number): void {
 function drawScreen(): void {
   clearScreen();
 
-  moveCursor(1, 1);
-  process.stdout.write("TONOGW");
+  const layoutTitleSearch = [
+    { row: 1, col: 1, text: "TONOGW" },
+    { row: 1, col: 25, text: "SIMPLE BOOK MANAGEMENT SYSTEM" },
+    { row: 1, col: 69, text: "TERMID: 2680" },
+    { row: 2, col: 1, text: "=".repeat(80) },
+    { row: 4, col: 1, text: "SEARCH BY BOOK TITLE" },
+    { row: 5, col: 1, text: "_".repeat(44) },
+    {
+      row: 7,
+      col: 1,
+      text: "BOOK TITLE. . . . . . : ",
+    },
+    { row: 7, col: 25, text: "\x1b[32m" + "_".repeat(20) + "\x1b[37m" },
+    { row: 20, col: 1, text: "PF1=Help" },
+    { row: 20, col: 20, text: "PF2=Main Menu" },
+    { row: 20, col: 42, text: "PF3=Search Book" },
+    { row: 20, col: 67, text: "ENTER=Continue" },
+    //  { row: , col: , text: "" },
+  ];
 
-  moveCursor(1, 25);
-  process.stdout.write("SIMPLE BOOK MANAGEMENT SYSTEM");
-
-  moveCursor(1, 66);
-  process.stdout.write("TERMID: TS-2680");
-
-  moveCursor(2, 1);
-  process.stdout.write("=".repeat(80));
-
-  moveCursor(4, 1);
-  process.stdout.write("SEARCH BOOK BY TITLE NAME");
-
-  moveCursor(5, 1);
-  process.stdout.write("_".repeat(44));
-
-  moveCursor(7, 1);
-  process.stdout.write(
-    "BOOK TITLE. . . . . . : " + "\x1b[32m" + "_".repeat(20),
-  );
-  process.stdout.write("\x1b[37m");
-
-  // moveCursor(9, 1);
-  // process.stdout.write("BOOK TITLE | AUTHOR | PUBLICATION YEAR");
-
-  moveCursor(20, 1);
-  process.stdout.write("PF1=Help");
-
-  moveCursor(20, 20);
-  process.stdout.write("PF2=Main Menu");
-
-  moveCursor(20, 42);
-  process.stdout.write("PF3=Search Book");
-
-  moveCursor(20, 67);
-  process.stdout.write("ENTER=Continue");
+  layoutTitleSearch.forEach((item) => {
+    moveCursor(item.row, item.col);
+    process.stdout.write(item.text);
+  });
 
   // Cursor position at input field
   moveCursor(7, 25);
@@ -149,8 +135,7 @@ process.stdin.on("data", (key: string) => {
   // Normaly typing
   inputTitle += key;
 
-  process.stdout.write("\x1b[32m" + key);
-  process.stdout.write("\x1b[37m");
+  process.stdout.write("\x1b[32m" + key + "\x1b[37m");
 });
 
 function clearResultArea(): void {
@@ -166,30 +151,54 @@ let currentScreen = "SEARCH";
 function drawMainMenu(): void {
   clearScreen();
 
-  moveCursor(1, 1);
-  process.stdout.write("MAIN MENU");
+  const layoutMainMenu = [
+    { row: 1, col: 1, text: "TONOGW" },
+    { row: 1, col: 25, text: "SIMPLE BOOK MANAGEMENT SYSTEM" },
+    { row: 1, col: 69, text: "TERMID: 2680" },
+    { row: 2, col: 1, text: "=".repeat(80) },
+    { row: 4, col: 1, text: "SEARCH BY BOOK TITLE" },
+    { row: 5, col: 1, text: "_".repeat(44) },
+    { row: 6, col: 1, text: "MAIN MENU" },
+    { row: 9, col: 1, text: "1. USER PROFILE" },
+    { row: 10, col: 1, text: "2. LIST BOOK" },
+    { row: 11, col: 1, text: "3. ADD BOOK" },
+    { row: 12, col: 1, text: "4. EXIT" },
+    { row: 20, col: 1, text: "PF1=Help" },
+    { row: 20, col: 20, text: "PF2=Main Menu" },
+    { row: 20, col: 42, text: "PF3=Search Book" },
+    { row: 20, col: 67, text: "ENTER=Continue" },
+  ];
 
-  moveCursor(4, 1);
-  process.stdout.write("1. USER PROFILE");
+  layoutMainMenu.forEach((item) => {
+    moveCursor(item.row, item.col);
 
-  moveCursor(5, 1);
-  process.stdout.write("2. LIST BOOK");
+    process.stdout.write(item.text);
+  });
 
-  moveCursor(6, 1);
-  process.stdout.write("3. ADD BOOK");
+  // moveCursor(1, 1);
+  // process.stdout.write("MAIN MENU");
 
-  moveCursor(7, 1);
-  process.stdout.write("4. EXIT");
+  // moveCursor(4, 1);
+  // process.stdout.write("1. USER PROFILE");
 
-  moveCursor(20, 1);
-  process.stdout.write("PF1=Help");
+  // moveCursor(5, 1);
+  // process.stdout.write("2. LIST BOOK");
 
-  moveCursor(20, 20);
-  process.stdout.write("PF2=Main Menu");
+  // moveCursor(6, 1);
+  // process.stdout.write("3. ADD BOOK");
 
-  moveCursor(20, 42);
-  process.stdout.write("PF3=Search Book");
+  // moveCursor(7, 1);
+  // process.stdout.write("4. EXIT");
 
-  moveCursor(20, 67);
-  process.stdout.write("ENTER=Continue");
+  // moveCursor(20, 1);
+  // process.stdout.write("PF1=Help");
+
+  // moveCursor(20, 20);
+  // process.stdout.write("PF2=Main Menu");
+
+  // moveCursor(20, 42);
+  // process.stdout.write("PF3=Search Book");
+
+  // moveCursor(20, 67);
+  // process.stdout.write("ENTER=Continue");
 }
