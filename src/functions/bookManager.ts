@@ -43,11 +43,18 @@ export function searchBook(author?: string): void {
   );
 
   if (result.length === 0) {
-    console.log("Author not found.");
+    console.log("\x1b[32m" + "Author not found.");
     return;
   }
 
+  console.log("BOOK TITLE".padEnd(35) + "AUTHOR".padEnd(25) + "YEAR");
+
+  console.log("-".repeat(65));
+
   result.forEach((book) => {
-    console.log(`${book.title} | ${book.author} | ${book.publicationYear}`);
+    console.log(
+      "\x1b[32m" +
+        `${book.title.padEnd(30)} | ${book.author.padEnd(25)} | ${book.publicationYear}`,
+    );
   });
 }

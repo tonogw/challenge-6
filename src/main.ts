@@ -9,7 +9,8 @@
 
 console.log("                     Book Management Application - Week 6");
 console.log(
-  "================================================================================",
+  "=".repeat(80),
+  // "================================================================================",
 );
 
 // Mulai pengujian di bawah ini
@@ -31,29 +32,42 @@ function moveCursor(row: number, col: number): void {
 function drawScreen(): void {
   clearScreen();
 
-  moveCursor(1, 24);
+  moveCursor(1, 1);
   process.stdout.write(
-    "SIMPLE BOOK MANAGEMENT SYSTEM             TERMID: TS-2680",
+    "TONOGW                 SIMPLE BOOK MANAGEMENT SYSTEM             TERMID: TS-2680",
   );
 
   moveCursor(2, 1);
-  process.stdout.write(
-    "================================================================================",
-  );
+  // process.stdout.write(
+  // "================================================================================",
+  console.log("=".repeat(80));
 
   moveCursor(4, 1);
   process.stdout.write("SEARCH BOOK BY AUTHOR NAME");
 
   moveCursor(5, 1);
-  process.stdout.write("_________________________________________");
+  process.stdout.write("____________________________________________");
 
   moveCursor(7, 1);
-  process.stdout.write("AUTHOR NAME . . . . . : ");
+  process.stdout.write(
+    "AUTHOR NAME . . . . . : " + "\x1b[32m" + "____________________",
+  );
+  process.stdout.write("\x1b[37m");
+
+  // moveCursor(9, 1);
+  // process.stdout.write("BOOK TITLE | AUTHOR | PUBLICATION YEAR");
 
   moveCursor(20, 1);
-  process.stdout.write(
-    "PF1=Help            PF2=Main Menu          PF3=Search Book        ENTER=Continue",
-  );
+  process.stdout.write("PF1=Help");
+
+  moveCursor(20, 20);
+  process.stdout.write("PF2=Main Menu");
+
+  moveCursor(20, 42);
+  process.stdout.write("PF3=Search Book");
+
+  moveCursor(20, 67);
+  process.stdout.write("ENTER=Continue");
 
   // Cursor position at input field
   moveCursor(7, 25);
@@ -94,11 +108,20 @@ process.stdin.setEncoding("utf8");
 let author = "";
 
 process.stdin.on("data", (key: string) => {
+  // F2
+  if (key === "\x1b0Q") {
+    currentScreen = "MENU";
+
+    drawMainMenu();
+
+    return;
+  }
+
   // ENTER
   if (key === "\r") {
     clearResultArea();
 
-    moveCursor(9, 1);
+    moveCursor(10, 1);
 
     searchBook(author);
 
@@ -130,15 +153,42 @@ process.stdin.on("data", (key: string) => {
   // Normaly typing
   author += key;
 
-  process.stdout.write(key);
+  process.stdout.write("\x1b[32m" + key);
+  process.stdout.write("\x1b[37m");
 });
 
 function clearResultArea(): void {
-  for (let row = 9; row <= 15; row++) {
+  for (let row = 10; row <= 15; row++) {
     moveCursor(row, 1);
 
     process.stdout.write(" ".repeat(80));
   }
+}
+
+let currentScreen = "SEARCH";
+
+function drawMainMenu(): void {
+  clearScreen();
+
+  moveCursor(1, 1);
+  process.stdout.write("MAIN MENU");
+
+  moveCursor(4, 1);
+  process.stdout.write("1. USER PROFILE");
+
+  moveCursor(5, 1);
+  process.stdout.write("2. LIST BOOK");
+
+  moveCursor(6, 1);
+  process.stdout.write("3. ADD BOOK");
+
+  moveCursor(7, 1);
+  process.stdout.write("4. EXIT");
+
+  moveCursor(20, 1);
+  process.stdout.write(
+    "PF1=Help            PF2=Main Menu          PF3=Search Book        ENTER=Continue",
+  );
 }
 
 // listBooks();
