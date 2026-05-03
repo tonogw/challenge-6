@@ -13,6 +13,7 @@ console.log(
 );
 
 // Mulai pengujian di bawah ini
+import * as readline from "readline";
 
 import { addBook, listBooks, searchBook } from "./functions/bookManager";
 
@@ -46,7 +47,18 @@ listBooks();
 console.log("\nSEARCH RESULT");
 console.log("=========================================");
 
-searchBook("clean");
+// searchBook("clean");
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
+rl.question("\nAUTHOR NAME . . . . .: ", (author: string) => {
+  console.log("\nSEARCH RESULT");
+  console.log("=========================================");
+
+  searchBook(author);
+});
 
 console.log(" ");
 console.log(" ");
