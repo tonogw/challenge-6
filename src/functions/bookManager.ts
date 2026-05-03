@@ -32,18 +32,19 @@ export function listBooks(): void {
 // Fungsi ini tidak mengembalikan nilai (void)
 // Petunjuk: jika parameter title diberikan, cari buku yang cocok
 //           jika tidak diberikan, tampilkan semua buku atau berikan informasi yang sesuai
-export function searchBook(author?: string): void {
-  if (!author) {
-    console.log("Search title is required");
+export function searchBook(title?: string): void {
+  if (!title) {
+    // console.log("Search title is required");
+    listBooks();
     return;
   }
 
   const result = books.filter((book) =>
-    book.author.toLowerCase().includes(author.toLowerCase()),
+    book.title.toLowerCase().includes(title.toLowerCase()),
   );
 
   if (result.length === 0) {
-    console.log("\x1b[32m" + "Author not found.");
+    console.log("\x1b[32m" + "Book not found.");
     return;
   }
 

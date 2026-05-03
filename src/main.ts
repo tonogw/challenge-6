@@ -13,10 +13,11 @@ console.log(
   // "================================================================================",
 );
 
+// import { title } from "node:process";
 // Mulai pengujian di bawah ini
 // import * as readline from "readline";
 
-import { addBook, searchBook } from "./functions/bookManager";
+import { addBook, listBooks, searchBook } from "./functions/bookManager";
 
 // Clear screen
 function clearScreen(): void {
@@ -33,24 +34,26 @@ function drawScreen(): void {
   clearScreen();
 
   moveCursor(1, 1);
-  process.stdout.write(
-    "TONOGW                 SIMPLE BOOK MANAGEMENT SYSTEM             TERMID: TS-2680",
-  );
+  process.stdout.write("TONOGW");
+
+  moveCursor(1, 25);
+  process.stdout.write("SIMPLE BOOK MANAGEMENT SYSTEM");
+
+  moveCursor(1, 66);
+  process.stdout.write("TERMID: TS-2680");
 
   moveCursor(2, 1);
-  // process.stdout.write(
-  // "================================================================================",
-  console.log("=".repeat(80));
+  process.stdout.write("=".repeat(80));
 
   moveCursor(4, 1);
-  process.stdout.write("SEARCH BOOK BY AUTHOR NAME");
+  process.stdout.write("SEARCH BOOK BY TITLE NAME");
 
   moveCursor(5, 1);
-  process.stdout.write("____________________________________________");
+  process.stdout.write("_".repeat(44));
 
   moveCursor(7, 1);
   process.stdout.write(
-    "AUTHOR NAME . . . . . : " + "\x1b[32m" + "____________________",
+    "BOOK TITLE. . . . . . : " + "\x1b[32m" + "_".repeat(20),
   );
   process.stdout.write("\x1b[37m");
 
@@ -72,13 +75,6 @@ function drawScreen(): void {
   // Cursor position at input field
   moveCursor(7, 25);
 }
-
-// console.log(
-//   "                         SIMPLE BOOK MANAGEMENT SYSTEM           TERMID: TS-2680",
-// );
-// console.log(
-//   "================================================================================",
-// );
 
 // Seed data
 addBook({
@@ -105,7 +101,7 @@ process.stdin.setRawMode(true);
 process.stdin.resume();
 process.stdin.setEncoding("utf8");
 
-let author = "";
+let inputTitle = "";
 
 process.stdin.on("data", (key: string) => {
   // F2
@@ -123,9 +119,9 @@ process.stdin.on("data", (key: string) => {
 
     moveCursor(10, 1);
 
-    searchBook(author);
+    searchBook(inputTitle);
 
-    moveCursor(7, 25 + author.length);
+    moveCursor(7, 25 + inputTitle.length);
 
     return;
   }
@@ -137,28 +133,28 @@ process.stdin.on("data", (key: string) => {
 
   // Backspace
   if (key === "\u007f") {
-    if (author.length > 0) {
-      author = author.slice(0, -1);
+    if (inputTitle.length > 0) {
+      inputTitle = inputTitle.slice(0, -1);
 
       moveCursor(7, 25);
 
-      process.stdout.write(author + " ");
+      process.stdout.write(inputTitle + " ");
 
-      moveCursor(7, 25 + author.length);
+      moveCursor(7, 25 + inputTitle.length);
     }
 
     return;
   }
 
   // Normaly typing
-  author += key;
+  inputTitle += key;
 
   process.stdout.write("\x1b[32m" + key);
   process.stdout.write("\x1b[37m");
 });
 
 function clearResultArea(): void {
-  for (let row = 10; row <= 15; row++) {
+  for (let row = 10; row <= 14; row++) {
     moveCursor(row, 1);
 
     process.stdout.write(" ".repeat(80));
@@ -186,31 +182,14 @@ function drawMainMenu(): void {
   process.stdout.write("4. EXIT");
 
   moveCursor(20, 1);
-  process.stdout.write(
-    "PF1=Help            PF2=Main Menu          PF3=Search Book        ENTER=Continue",
-  );
+  process.stdout.write("PF1=Help");
+
+  moveCursor(20, 20);
+  process.stdout.write("PF2=Main Menu");
+
+  moveCursor(20, 42);
+  process.stdout.write("PF3=Search Book");
+
+  moveCursor(20, 67);
+  process.stdout.write("ENTER=Continue");
 }
-
-// listBooks();
-
-// console.log("\nSEARCH RESULT");
-// console.log("=========================================");
-
-// // searchBook("clean");
-// const rl = readline.createInterface({
-//   input: process.stdin,
-//   output: process.stdout,
-// });
-
-// rl.question("\nAUTHOR NAME . . . . .: ", (author: string) => {
-//   console.log("\nSEARCH RESULT");
-//   console.log("=========================================");
-
-//   searchBook(author);
-// });
-
-// console.log(" ");
-// console.log(" ");
-// console.log(
-//   "PF1=Help            PF2=Main Menu          PF3=Search Book        ENTER=Continue",
-// );
