@@ -2,7 +2,9 @@
 
 import { Book } from "../types";
 import { books } from "../data/books";
-
+import { cursorTo } from "node:readline";
+import * as readline from "node:readline";
+const rl = readline;
 // Fungsi addBook
 // Fungsi ini digunakan untuk menambahkan buku baru ke dalam koleksi
 // Parameter yang dibutuhkan: data buku sesuai tipe Book
@@ -18,12 +20,26 @@ export function addBook(book: Book): void {
 // Fungsi ini tidak mengembalikan nilai (void)
 // Petunjuk: pikirkan cara menampilkan data buku dengan format yang mudah dibaca
 export function listBooks(): void {
-  console.log("\nBOOK LIST");
-  console.log("=========================================");
+  rl.cursorTo(process.stdout, 10, 1);
+  process.stdout.write("BOOK TITLE".padEnd(45) + "AUTHOR".padEnd(25) + "YEAR");
+  books.forEach((book, index) => {
+    rl.cursorTo(process.stdout, 1 + index, 10);
 
-  books.forEach((book) => {
-    console.log(`${book.title} | ${book.author} | ${book.publicationYear}`);
+    process.stdout.write(
+      `${book.title.padEnd(45)} | ${book.author.padEnd(25)} | ${book.publicationYear}`,
+    );
   });
+
+  // console.log("\nBOOK LIST");
+  // console.log("_".repeat(80));
+
+  // books.forEach((book) => {
+  //   console.log("BOOK TITLE".padEnd(45) + "AUTHOR".padEnd(25) + "YEAR");
+
+  //   console.log(
+  //     `${book.title.padEnd(45)} | ${book.author.padEnd(25)} | ${book.publicationYear}`,
+  //   );
+  // });
 }
 
 // Fungsi searchBook
@@ -48,14 +64,14 @@ export function searchBook(title?: string): void {
     return;
   }
 
-  console.log("BOOK TITLE".padEnd(35) + "AUTHOR".padEnd(25) + "YEAR");
+  console.log("BOOK TITLE".padEnd(45) + "AUTHOR".padEnd(25) + "YEAR");
 
-  console.log("-".repeat(65));
+  console.log("-".repeat(80));
 
   result.forEach((book) => {
     console.log(
       "\x1b[32m" +
-        `${book.title.padEnd(30)} | ${book.author.padEnd(25)} | ${book.publicationYear}`,
+        `${book.title.padEnd(45)} | ${book.author.padEnd(25)} | ${book.publicationYear}`,
     );
   });
 }
