@@ -98,3 +98,13 @@ export function searchBook(title?: string): void {
     });
   }
 }
+
+// Utilites
+// untuk pindah koordinat, hapus result area, gconstruct screen
+
+// ScreenName
+// untuk membuat display screen
+// drawMenu()
+// drawInquiry()
+// drawAdd()
+// drawHelp()

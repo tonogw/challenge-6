@@ -13,3 +13,18 @@ export interface Book {
 export function moveDot(row: number, col: number): void {
   process.stdout.write(`\x1b[${row};${col}H`);
 }
+
+export interface ScreenField {
+  row: number;
+  col: number;
+  text: string;
+}
+
+export type ScreenName = "MENU" | "INQUIRY" | "ADD" | "HELP";
+
+export interface AppState {
+  currentScreen: ScreenName;
+  menuSelection: string;
+  inputTitle: string;
+  currentPage: number;
+}
