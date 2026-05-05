@@ -9,3 +9,7 @@ export interface Book {
   author: string;
   publicationYear: number;
 }
+
+export function moveDot(row: number, col: number): void {
+  process.stdout.write(`\x1b[${row};${col}H`);
+}

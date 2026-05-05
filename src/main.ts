@@ -15,6 +15,8 @@ import { books } from "./data/books";
 // Mulai pengujian di bawah ini
 import * as readline from "node:readline";
 
+import { moveDot } from "./types";
+
 // process.stdin.on("data", (key: string) => {
 //   console.log(JSON.stringify(key));
 // });
@@ -29,7 +31,7 @@ function clearScreen(): void {
 }
 
 // Move cursor
-// function moveCursor(row: number, col: number): void {
+// function moveDot(row: number, col: number): void {
 //   process.stdout.write(`\x1b[${row};${col}H`);
 // }
 
@@ -42,14 +44,14 @@ function drawSearch(): void {
     { row: 1, col: 25, text: "SIMPLE BOOK MANAGEMENT SYSTEM" },
     { row: 1, col: 69, text: "TERMID: 2680" },
     { row: 2, col: 1, text: "=".repeat(80) },
-    { row: 4, col: 1, text: "SEARCH BOOK BY TITLE" },
-    { row: 5, col: 1, text: "_".repeat(44) },
-    {
-      row: 7,
-      col: 1,
-      text: "BOOK TITLE. . . . . . : ",
-    },
-    { row: 7, col: 25, text: "\x1b[32m" + "_".repeat(40) + "\x1b[37m" },
+    { row: 4, col: 1, text: "SEARCH BOOK BY TITLE :" },
+    { row: 5, col: 1, text: "_".repeat(80) },
+    // {
+    //   row: 7,
+    //   col: 1,
+    //   text: "BOOK TITLE: ",
+    // },
+    { row: 4, col: 24, text: "\x1b[32m" + "_".repeat(40) + "\x1b[37m" },
 
     // Shortcut keys
     { row: 20, col: 1, text: "PF1=Help" },
@@ -60,12 +62,12 @@ function drawSearch(): void {
   ];
 
   layoutTitleSearch.forEach((item) => {
-    rl.cursorTo(process.stdout, item.col, item.row);
+    moveDot(item.row, item.col);
     process.stdout.write(item.text);
   });
 
   // Cursor position at input field
-  rl.cursorTo(process.stdout, 25, 7);
+  moveDot(4, 24);
 }
 
 drawMainMenu();
@@ -77,174 +79,193 @@ process.stdin.setEncoding("utf8");
 let inputTitle = "";
 
 process.stdin.on("data", (key: string) => {
+  // debug(JSON.stringify(key));
+  if (handleFunctionKey(key)) {
+    return;
+  }
+
+  switch (currentScreen) {
+    case "MENU":
+      // if (currentScreen === "MENU") {
+      handleMenuInput(key);
+      break;
+
+    case "SEARCH":
+      // if (currentScreen === "SEARCH") {
+      handleSearchInput(key);
+      break;
+
+    case "LIST":
+      // if (currentScreen === "LIST") {
+      handleListInput(key);
+      break;
+
+    case "ADD":
+      // if (currentScreen === "ADD") {
+      handleAddInput(key);
+      break;
+  }
+});
+
+function handleFunctionKey(key: string): boolean {
   // F1
   if (key === "\u001bOP") {
     currentScreen = "HELP";
+    // clearScreen();
     drawHelp();
-    return;
+    return true;
   }
 
   // F2
   if (key === "\u001bOQ") {
     currentScreen = "MENU";
+    // clearScreen();
+    menuSelection = "";
     drawMainMenu();
-    return;
+    return true;
   }
 
-  // F3 =|| "s" -> temporary due to Mac keyboad: searh in terminal
-  if (key === "\u001bOR" || key.toLowerCase() === "s") {
+  // F3
+  if (key === "\u001bOR") {
     currentScreen = "SEARCH";
+    // clearScreen();
     inputTitle = "";
     drawSearch();
+    return true;
+  }
+
+  // F4 exit || Crtl+C
+  // if (key === "\u0003") {
+  //   clearScreen();
+  //   process.exit();
+
+  return false;
+}
+
+function handleMenuInput(key: string): void {
+  moveDot(22, 1);
+  debug(`KEY=[${JSON.stringify(key)}]`);
+
+  // Typing
+  if ("1234".includes(key)) {
+    menuSelection = key;
+    moveDot(13, 43);
+    process.stdout.write("\x1b[32m" + key + "\x1b[37m");
+
+    // debug(`MENU KEY=[${key}] |  ${currentScreen} | ${menuSelection}`);
+
     return;
   }
 
-  // ENTER
-  if (key === "\r") {
-    // clearResultArea();
-    // rl.cursorTo(process.stdout,10, 1);
-    // searchBook(inputTitle);
-    // rl.cursorTo(process.stdout,7, 25 + inputTitle.length);
-    if (currentScreen === "MENU") {
-      if (menuSelection === "1") {
-        currentScreen = "SEARCH";
-        inputTitle = "";
-        drawSearch();
-        return;
-      }
-      if (menuSelection === "2") {
-        currentScreen = "LIST";
-        drawListScreen();
-        return;
-      }
-      if (menuSelection === "3") {
-        currentScreen = "ADD";
-        drawSearch();
-        return;
-      }
-      if (menuSelection === "4") {
-        process.exit();
-      }
-    }
+  // Backspace
+  // if (key === "\u007f") {
+  //   menuSelection = "";
+  //   moveDot(13, 43);
+  //   process.stdout.write("_");
+  //   return;
+  // }
+
+  // ENTER only
+  if (key !== "\r") {
     return;
     console.log(currentScreen);
     console.log(menuSelection);
   }
 
-  // CTRL+C
-  if (key === "\u0003") {
-    process.exit();
+  switch (menuSelection) {
+    case "1":
+      currentScreen = "SEARCH";
+      inputTitle = "";
+      // clearScreen();
+      drawSearch();
+
+      break;
+
+    case "2":
+      currentScreen = "LIST";
+      // clearScreen();
+      drawListScreen();
+      moveDot(4, 24);
+      listBooks();
+
+      break;
+
+    case "3":
+      currentScreen = "ADD";
+      // clearScreen();
+      drawAddScreen();
+      break;
+
+    case "4":
+      // currentScreen = "MENU";
+      clearScreen();
+      process.exit();
   }
 
-  // Backspace
+  menuSelection = "";
+}
+
+function redrawSearchField(): void {
+  moveDot(4, 24);
+  process.stdout.write("\x1b[32m" + "_".repeat(40) + "\x1b[37m");
+
+  moveDot(4, 24);
+  process.stdout.write("\x1b[32m" + inputTitle + "\x1b[37m");
+
+  moveDot(4, 24 + inputTitle.length);
+}
+
+function handleSearchInput(key: string): void {
   if (key === "\u007f") {
     if (inputTitle.length > 0) {
       inputTitle = inputTitle.slice(0, -1);
-      rl.cursorTo(process.stdout, 25, 7);
-      process.stdout.write(inputTitle + " ");
-      rl.cursorTo(process.stdout, 25, 7 + inputTitle.length);
-    }
 
-    return;
-  }
+      moveDot(4, 24);
+      process.stdout.write(inputTitle + " ".repeat(80));
 
-  // Normaly typing
-  // inputTitle += key;
-  // process.stdout.write("\x1b[32m" + key + "\x1b[37m");
-
-  if (currentScreen === "MENU") {
-    handleMenuInput(key);
-    return;
-  }
-
-  if (currentScreen === "SEARCH") {
-    handleSearchInput(key);
-    return;
-  }
-
-  if (currentScreen === "ADD") {
-    handleAddInput(key);
-    return;
-  }
-
-  function handleMenuInput(key: string): void {
-    if ("1234".includes(key)) {
-      menuSelection = key;
-      rl.cursorTo(process.stdout, 43, 13);
-      process.stdout.write("\x1b[32m" + key + "\x1b[37m");
+      // moveDot(7, 14 + inputTitle.length);
     }
     return;
   }
 
-  function handleSearchInput(key: string): void {
-    if (key === "\r") {
-      // if (inputTitle.length > 0) {
-      clearResultArea();
-      // inputTitle = inputTitle.slice(0, -1);
-      //
-      rl.cursorTo(process.stdout, 1, 10);
-      if (inputTitle.trim() === "") {
-        listBooks();
-      } else {
-        searchBook(inputTitle);
-      }
-      rl.cursorTo(process.stdout, 25, 7 + inputTitle.length);
-      return;
-    }
-
-    // if (key === "\r") {
-    //   clearResultArea();
-    //   rl.cursorTo(process.stdout,10, 1);
-    //   searchBook(inputTitle);
-    //   return;
-    // }
-    inputTitle += key;
-    process.stdout.write("\x1b[32m" + key + "\x1b[37m");
-  }
-
-  function handleAddInput(key: string): void {}
-
-  if (key === "\u007f") {
-    menuSelection = "";
-    rl.cursorTo(process.stdout, 43, 13);
-    process.stdout.write("_");
-    rl.cursorTo(process.stdout, 43, 13);
-    return;
-  }
-
-  // Selection MENU
   if (key === "\r") {
-    if (menuSelection === "1") {
-      currentScreen = "SEARCH";
-      inputTitle = "";
-      drawSearch();
+    clearResultArea();
 
-      return;
-    }
-    if (menuSelection === "2") {
-      currentScreen = "LIST";
-      menuSelection = "";
-      drawListScreen();
+    // moveDot(9, 1);
 
-      return;
-    }
+    // if (inputTitle.trim() === "") {
+    // currentScreen = "SEARCH";
+    // clearScreen();
+    // drawListScreen();
+    // moveDot(8, 1);
+    // listBooks();
 
-    if (menuSelection === "3") {
-      currentScreen = "ADD";
-      menuSelection = "";
-      drawAddScreen();
-    }
+    searchBook(inputTitle);
 
-    if (menuSelection === "4") {
-      clearScreen();
-      process.exit();
-    }
+    moveDot(4, 24 + inputTitle.length);
+    // moveDot(9, 1);
+    // process.stdout.write(": " + inputTitle.length);
+
+    return;
   }
-});
+
+  inputTitle += key;
+
+  // process.stdout.write("\x1b[32m" + key + "\x1b[37m");
+  redrawSearchField();
+}
+
+function handleListInput(key: string): void {
+  return;
+}
+
+function handleAddInput(key: string): void {
+  return;
+}
 
 function clearResultArea(): void {
-  for (let row = 10; row <= 14; row++) {
-    rl.cursorTo(process.stdout, 1, row);
+  for (let row = 7; row <= 19; row++) {
+    moveDot(row, 1);
 
     process.stdout.write(" ".repeat(80));
   }
@@ -280,11 +301,11 @@ function drawMainMenu(): void {
   ];
 
   layoutMainMenu.forEach((item) => {
-    rl.cursorTo(process.stdout, item.col, item.row);
+    moveDot(item.row, item.col);
 
     process.stdout.write(item.text);
   });
-  rl.cursorTo(process.stdout, 43, 13);
+  moveDot(13, 43);
 }
 
 let menuSelection = "";
@@ -301,42 +322,7 @@ function drawHelp(): void {
     { row: 4, col: 38, text: "HELP" },
     { row: 5, col: 25, text: "_".repeat(29) },
 
-    { row: 7, col: 25, text: " F1 = HELP " },
-    { row: 8, col: 25, text: "F2 = MAIN MENU " },
-    { row: 9, col: 25, text: "F3 = SEARCH books" },
-    { row: 11, col: 1, text: " RECOMMENDED FONT:" },
-    { row: 12, col: 1, text: "Menlo 14" },
-    { row: 13, col: 1, text: "FOR MAC:" },
-    { row: 14, col: 1, text: "Terminal -> Settings -> Font" },
-    { row: 15, col: 1, text: "HELP" },
-
-    // Shortcut keys
-    { row: 20, col: 1, text: "PF1=Help" },
-    { row: 20, col: 20, text: "PF2=Main Menu" },
-    { row: 20, col: 42, text: "PF3=Search Book" },
-    { row: 20, col: 67, text: "ENTER=Continue" },
-  ];
-  layoutHelp.forEach((item) => {
-    rl.cursorTo(process.stdout, item.col, item.row);
-    process.stdout.write(item.text);
-  });
-
-  currentScreen = "HELP";
-}
-
-// Menu List Books
-function drawListScreen(): void {
-  clearScreen();
-
-  const layoutList = [
-    { row: 1, col: 1, text: "©TONOGW" },
-    { row: 1, col: 25, text: "SIMPLE BOOK MANAGEMENT SYSTEM" },
-    { row: 1, col: 69, text: "TERMID: 2680" },
-    { row: 2, col: 1, text: "=".repeat(80) },
-    { row: 4, col: 38, text: "BOOK LIST" },
-    { row: 5, col: 25, text: "_".repeat(29) },
-
-    { row: 7, col: 25, text: " F1 = HELP " },
+    { row: 7, col: 25, text: "F1 = HELP " },
     { row: 8, col: 25, text: "F2 = MAIN MENU " },
     { row: 9, col: 25, text: "F3 = SEARCH books" },
     { row: 11, col: 1, text: "RECOMMENDED FONT:" },
@@ -351,8 +337,44 @@ function drawListScreen(): void {
     { row: 20, col: 42, text: "PF3=Search Book" },
     { row: 20, col: 67, text: "ENTER=Continue" },
   ];
+  layoutHelp.forEach((item) => {
+    moveDot(item.row, item.col);
+    process.stdout.write(item.text);
+  });
+
+  currentScreen = "HELP";
+}
+
+// Menu List Books
+function drawListScreen(): void {
+  clearScreen();
+  listBooks();
+
+  const layoutList = [
+    { row: 1, col: 1, text: "©TONOGW" },
+    { row: 1, col: 25, text: "SIMPLE BOOK MANAGEMENT SYSTEM" },
+    { row: 1, col: 69, text: "TERMID: 2680" },
+    { row: 2, col: 1, text: "=".repeat(80) },
+    { row: 4, col: 34, text: "BOOK LIST" },
+    { row: 5, col: 25, text: "_".repeat(29) },
+
+    // { row: 7, col: 25, text: " F1 = HELP " },
+    // { row: 8, col: 25, text: "F2 = MAIN MENU " },
+    // { row: 9, col: 25, text: "F3 = SEARCH books" },
+    // { row: 11, col: 1, text: "RECOMMENDED FONT:" },
+    // { row: 12, col: 1, text: "Menlo 14" },
+    // { row: 13, col: 1, text: "FOR MAC:" },
+    // { row: 14, col: 1, text: "Terminal -> Settings -> Font" },
+    // { row: 15, col: 1, text: "HELP" },
+
+    // Shortcut keys
+    { row: 20, col: 1, text: "PF1=Help" },
+    { row: 20, col: 20, text: "PF2=Main Menu" },
+    { row: 20, col: 42, text: "PF3=Search Book" },
+    { row: 20, col: 67, text: "ENTER=Continue" },
+  ];
   layoutList.forEach((item) => {
-    rl.cursorTo(process.stdout, item.col, item.row);
+    moveDot(item.row, item.col);
     process.stdout.write(item.text);
   });
 
@@ -371,10 +393,10 @@ function drawAddScreen(): void {
     { row: 4, col: 38, text: "ADD BOOK" },
     { row: 5, col: 25, text: "_".repeat(29) },
 
-    { row: 7, col: 25, text: "Book Title . . . . : " },
+    { row: 7, col: 25, text: "Book Title . . . . :" },
     { row: 8, col: 25, text: "Author Name  . . . : " },
     { row: 9, col: 25, text: "Publication Year . : " },
-    { row: 11, col: 1, text: " RECOMMENDED FONT:" },
+    { row: 11, col: 1, text: "RECOMMENDED FONT:" },
     { row: 12, col: 1, text: "Menlo 14" },
     { row: 13, col: 1, text: "FOR MAC:" },
     { row: 14, col: 1, text: "Terminal -> Settings -> Font" },
@@ -388,9 +410,15 @@ function drawAddScreen(): void {
   ];
 
   layoutAdd.forEach((item) => {
-    rl.cursorTo(process.stdout, item.col, item.row);
+    moveDot(item.row, item.col);
     process.stdout.write(item.text);
   });
 
   currentScreen = "ADD";
 }
+
+function debug(message: string): void {
+  moveDot(21, 1);
+  process.stdout.write(message.padEnd(80));
+}
+// debug(`MENU KEY=${key} | | ${currentScreen} | ${menuSelection}`);

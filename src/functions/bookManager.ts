@@ -5,6 +5,9 @@ import { books } from "../data/books";
 import { cursorTo } from "node:readline";
 import * as readline from "node:readline";
 const rl = readline;
+
+import { moveDot } from "../types";
+
 // Fungsi addBook
 // Fungsi ini digunakan untuk menambahkan buku baru ke dalam koleksi
 // Parameter yang dibutuhkan: data buku sesuai tipe Book
@@ -20,13 +23,18 @@ export function addBook(book: Book): void {
 // Fungsi ini tidak mengembalikan nilai (void)
 // Petunjuk: pikirkan cara menampilkan data buku dengan format yang mudah dibaca
 export function listBooks(): void {
-  rl.cursorTo(process.stdout, 10, 1);
-  process.stdout.write("BOOK TITLE".padEnd(45) + "AUTHOR".padEnd(25) + "YEAR");
+  moveDot(7, 1);
+  process.stdout.write("BOOK TITLE".padEnd(48) + "AUTHOR".padEnd(27) + "YEAR");
+
+  moveDot(8, 1);
+  process.stdout.write("_".repeat(80));
   books.forEach((book, index) => {
-    rl.cursorTo(process.stdout, 1 + index, 10);
+    moveDot(9 + index, 1);
 
     process.stdout.write(
-      `${book.title.padEnd(45)} | ${book.author.padEnd(25)} | ${book.publicationYear}`,
+      "\x1b[32m" +
+        `${book.title.padEnd(45)} | ${book.author.padEnd(25)} | ${book.publicationYear}` +
+        "\x1b[37m",
     );
   });
 
@@ -49,8 +57,10 @@ export function listBooks(): void {
 // Petunjuk: jika parameter title diberikan, cari buku yang cocok
 //           jika tidak diberikan, tampilkan semua buku atau berikan informasi yang sesuai
 export function searchBook(title?: string): void {
-  if (!title) {
+  if (!title?.trim()) {
     // console.log("Search title is required");
+    moveDot(9, 1);
+    process.stdout.write("\x1b[32m");
     listBooks();
     return;
   }
@@ -60,18 +70,31 @@ export function searchBook(title?: string): void {
   );
 
   if (result.length === 0) {
-    console.log("\x1b[32m" + "Book not found.");
+    moveDot(9, 27);
+    process.stdout.write(
+      "\x1b[31m" + "*** NO MATCHING RECORD ***" + "\x1b[37m",
+    );
+
+    // process.stdout.write("\x1b[32m");
+    // listBooks();
     return;
   }
 
-  console.log("BOOK TITLE".padEnd(45) + "AUTHOR".padEnd(25) + "YEAR");
-
-  console.log("-".repeat(80));
-
-  result.forEach((book) => {
-    console.log(
-      "\x1b[32m" +
-        `${book.title.padEnd(45)} | ${book.author.padEnd(25)} | ${book.publicationYear}`,
+  if (result.length > 0) {
+    moveDot(7, 1);
+    process.stdout.write(
+      "BOOK TITLE".padEnd(48) + "AUTHOR".padEnd(27) + "YEAR",
     );
-  });
+    moveDot(8, 1);
+    process.stdout.write("-".repeat(80));
+
+    result.forEach((book, index) => {
+      moveDot(9 + index, 1);
+      process.stdout.write(
+        "\x1b[32m" +
+          `${book.title.padEnd(45)} | ${book.author.padEnd(25)} | ${book.publicationYear}` +
+          "\x1b[37m",
+      );
+    });
+  }
 }
