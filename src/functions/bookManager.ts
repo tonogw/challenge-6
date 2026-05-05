@@ -194,8 +194,8 @@ const layoutHelp: ScreenField[] = [
 
 const layoutBookHeader: ScreenField[] = [
   { row: 7, col: 1, text: "BOOK TITLE" },
-  { row: 7, col: 48, text: "AUTHOR" },
-  { row: 7, col: 75, text: "YEAR" },
+  { row: 7, col: 49, text: "AUTHOR" },
+  { row: 7, col: 77, text: "YEAR" },
   { row: 8, col: 1, text: "_".repeat(80) },
 ];
 

@@ -67,12 +67,12 @@ process.stdin.on("data", (key: string) => {
 
     case "ADD":
       // if (currentScreen === "ADD") {
-      handleListInput(key);
+      handleAddInput(key);
       break;
 
     case "HELP":
       // if (currentScreen === "HELP") {
-      handleAddInput(key);
+
       break;
   }
 });
@@ -97,7 +97,7 @@ function handleFunctionKey(key: string): boolean {
 
   // F3
   if (key === "\u001bOR") {
-    currentScreen = "SEARCH";
+    currentScreen = "INQUIRY";
     // clearScreen();
     inputTitle = "";
     drawInquiry();
@@ -138,8 +138,8 @@ function handleMenuInput(key: string): void {
   // ENTER only
   if (key !== "\r") {
     return;
-    console.log(currentScreen);
-    console.log(menuSelection);
+    // console.log(currentScreen);
+    // console.log(menuSelection);
   }
 
   switch (menuSelection) {
@@ -176,51 +176,61 @@ function handleMenuInput(key: string): void {
 
 function redrawSearchField(): void {
   moveDot(4, 24);
-  process.stdout.write("\x1b[32m" + "_".repeat(40) + "\x1b[37m");
+  process.stdout.write("\x1b[32m" + inputTitle.padEnd(40) + "\x1b[37m");
 
-  moveDot(4, 24);
-  process.stdout.write("\x1b[32m" + inputTitle + "\x1b[37m");
+  // moveDot(4, 24);
+  // process.stdout.write("\x1b[32m" + inputTitle + "\x1b[37m");
 
   moveDot(4, 24 + inputTitle.length);
 }
 
 function handleSearchInput(key: string): void {
-  if (key === "\u007f") {
-    if (inputTitle.length > 0) {
-      inputTitle = inputTitle.slice(0, -1);
-
-      moveDot(4, 24);
-      process.stdout.write(inputTitle + " ".repeat(20));
-
-      // moveDot(7, 14 + inputTitle.length);
-    }
-    return;
-  }
-
+  // ENTER
   if (key === "\r") {
     clearResultArea();
 
-    // moveDot(9, 1);
+    if (inputTitle.trim() === "") {
+      listBooks();
+    } else {
+      searchBook(inputTitle);
+    }
+    //
 
-    // if (inputTitle.trim() === "") {
-    // currentScreen = "SEARCH";
-    // clearScreen();
-    // drawListScreen();
-    // moveDot(8, 1);
-    // listBooks();
-
-    searchBook(inputTitle);
+    // moveDot(4, 24);
+    // process.stdout.write(inputTitle);
 
     moveDot(4, 24 + inputTitle.length);
+
+    return;
+  }
+
+  // Backspace
+  if (key === "\u007f") {
+    //   clearResultArea();
+
+    //   // moveDot(9, 1);
+
+    if (inputTitle.length > 0) {
+      //   // currentScreen = "SEARCH";
+      //   // clearScreen();
+      //   // drawListScreen();
+      //   // moveDot(8, 1);
+      //   // listBooks();
+      inputTitle = inputTitle.slice(0, -1);
+      // searchBook(inputTitle);
+      redrawSearchField();
+    }
+    //   moveDot(4, 24 + inputTitle.length);
     // moveDot(9, 1);
     // process.stdout.write(": " + inputTitle.length);
 
     return;
   }
 
+  // Normal typing
   inputTitle += key;
 
-  // process.stdout.write("\x1b[32m" + key + "\x1b[37m");
+  process.stdout.write("\x1b[32m" + key + "\x1b[37m");
   redrawSearchField();
 }
 
@@ -233,46 +243,6 @@ function handleAddInput(key: string): void {
 }
 
 let menuSelection = "";
-
-// PF1=Help
-
-// Menu List Books
-// function drawListScreen(): void {
-//   clearScreen();
-//   listBooks();
-
-//   const layoutList = [
-//     { row: 1, col: 1, text: "©TONOGW" },
-//     { row: 1, col: 25, text: "SIMPLE BOOK MANAGEMENT SYSTEM" },
-//     { row: 1, col: 69, text: "TERMID: 2680" },
-//     { row: 2, col: 1, text: "=".repeat(80) },
-//     { row: 4, col: 34, text: "BOOK LIST" },
-//     { row: 5, col: 25, text: "_".repeat(29) },
-
-// { row: 7, col: 25, text: " F1 = HELP " },
-// { row: 8, col: 25, text: "F2 = MAIN MENU " },
-// { row: 9, col: 25, text: "F3 = SEARCH books" },
-// { row: 11, col: 1, text: "RECOMMENDED FONT:" },
-// { row: 12, col: 1, text: "Menlo 14" },
-// { row: 13, col: 1, text: "FOR MAC:" },
-// { row: 14, col: 1, text: "Terminal -> Settings -> Font" },
-// { row: 15, col: 1, text: "HELP" },
-
-// Shortcut keys
-//     { row: 20, col: 1, text: "PF1=Help" },
-//     { row: 20, col: 20, text: "PF2=Main Menu" },
-//     { row: 20, col: 42, text: "PF3=Search Book" },
-//     { row: 20, col: 67, text: "ENTER=Continue" },
-//   ];
-//   layoutList.forEach((item) => {
-//     moveDot(item.row, item.col);
-//     process.stdout.write(item.text);
-//   });
-
-//   currentScreen = "LIST";
-// }
-
-// Menu Add Book
 
 // function debug(message: string): void {
 //   moveDot(21, 1);
