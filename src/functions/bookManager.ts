@@ -30,14 +30,28 @@ function renderBookHeader(): void {
   drawBookHeader();
 }
 
-function renderBookRows(records: Book[]): void {
-  records.forEach((book, index) => {
+// function renderBookRows(records: Book[]): void {
+//   records.forEach((book, index) => {
+//     moveDot(9 + index, 1);
+//     // process.stdout.write(
+//     //   "\x1b[32m" +
+//     //     `${book.title.padEnd(45)} | ${book.author.padEnd(25)} | ${book.publicationYear}` +
+//     //     "\x1b[37m",
+//     // );
+//     process.stdout.write(
+//       "\x1b[32m" +
+//         `${book.title.slice(0, 45).padEnd(45)} | ${book.author.slice(0, 25).padEnd(25)} | ${book.publicationYear}` +
+//         "\x1b[37m",
+//     );
+//   });
+// }
+// let browseOffset = 0;
+const PAGE_SIZE = 11;
+
+function renderBookRows(records: Book[], offset = 0): void {
+  const pageRows = records.slice(offset, offset + PAGE_SIZE);
+  pageRows.forEach((book, index) => {
     moveDot(9 + index, 1);
-    // process.stdout.write(
-    //   "\x1b[32m" +
-    //     `${book.title.padEnd(45)} | ${book.author.padEnd(25)} | ${book.publicationYear}` +
-    //     "\x1b[37m",
-    // );
     process.stdout.write(
       "\x1b[32m" +
         `${book.title.slice(0, 45).padEnd(45)} | ${book.author.slice(0, 25).padEnd(25)} | ${book.publicationYear}` +
@@ -56,9 +70,9 @@ function showNoMatch(): void {
 // Tidak memerlukan parameter
 // Fungsi ini tidak mengembalikan nilai (void)
 // Petunjuk: pikirkan cara menampilkan data buku dengan format yang mudah dibaca
-export function listBooks(): void {
+export function listBooks(offset = 0): void {
   renderBookHeader();
-  renderBookRows(books);
+  renderBookRows(books, offset);
 }
 
 // Fungsi searchBook
@@ -67,7 +81,7 @@ export function listBooks(): void {
 // Fungsi ini tidak mengembalikan nilai (void)
 // Petunjuk: jika parameter title diberikan, cari buku yang cocok
 //           jika tidak diberikan, tampilkan semua buku atau berikan informasi yang sesuai
-export function searchBook(title?: string): void {
+export function searchBook(title?: string, offset = 0): void {
   if (!title?.trim()) {
     moveDot(9, 1);
     process.stdout.write("\x1b[32m");
@@ -85,7 +99,7 @@ export function searchBook(title?: string): void {
   }
 
   renderBookHeader();
-  renderBookRows(result);
+  renderBookRows(result, offset);
 }
 
 // Utilites
@@ -166,6 +180,15 @@ const layoutBookHeader: ScreenField[] = [
   { row: 8, col: 1, text: "-".repeat(80) },
 ];
 
+const layoutFooterOffset: ScreenField[] = [
+  // Footer / Shortcut keys
+  { row: 20, col: 1, text: "PF1=Help" },
+  { row: 20, col: 13, text: "PF2=Main Menu" },
+  { row: 20, col: 32, text: "PF3=Search Book" },
+  { row: 20, col: 53, text: "PF4=BACK" },
+  { row: 20, col: 66, text: "ENTER=NEXT PAGE" },
+];
+
 export function drawFields(fields: ScreenField[]): void {
   fields.forEach((item) => {
     moveDot(item.row, item.col);
@@ -191,6 +214,17 @@ export function drawInquiry(): void {
   drawFields(layoutHeader);
   drawFields(layoutInquiry);
   drawFields(layoutFooter);
+
+  // Cursor position at input field
+  moveDot(4, 24);
+}
+
+export function drawInquiryOffset(): void {
+  clearScreen();
+
+  drawFields(layoutHeader);
+  drawFields(layoutInquiry);
+  drawFields(layoutFooterOffset);
 
   // Cursor position at input field
   moveDot(4, 24);

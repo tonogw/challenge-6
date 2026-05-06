@@ -27,6 +27,7 @@ import {
   drawAdd,
   drawHelp,
   clearResultArea,
+  drawInquiryOffset,
 } from "./functions/bookManager";
 import { moveCursor } from "node:readline";
 
@@ -39,6 +40,10 @@ process.stdin.resume();
 process.stdin.setEncoding("utf8");
 
 let inputTitle = "";
+let currentBrowseRecords = books;
+let browseOffset = 0;
+
+const PAGE_SIZE = 11;
 
 process.stdin.on("data", (key: string) => {
   if (handleFunctionKey(key)) {
@@ -113,6 +118,10 @@ function handleMenuSelection(key: string): void {
       currentScreen = "INQUIRY";
       inputTitle = "";
 
+      browseOffset = 0;
+
+      currentBrowseRecords = books;
+
       drawInquiry();
       moveDot(4, 24);
 
@@ -149,13 +158,36 @@ function redrawSearchField(): void {
 function handleSearchInput(key: string): void {
   // ENTER
   if (key === "\r") {
-    clearResultArea();
+    browseOffset = 0;
+    // clearResultArea();
 
     if (inputTitle.trim() === "") {
-      listBooks();
+      currentBrowseRecords = books;
+      // listBooks(browseOffset);
     } else {
-      searchBook(inputTitle);
+      currentBrowseRecords = books.filter((book) =>
+        book.title.toLowerCase().includes(inputTitle.toLowerCase()),
+      );
+      // searchBook(inputTitle);
     }
+
+    // redraw screen
+    if (currentBrowseRecords.length > PAGE_SIZE) {
+      drawInquiryOffset();
+    } else {
+      drawInquiry();
+    }
+
+    // redraw inputTitle field
+    redrawSearchField();
+
+    // Render result
+    if (inputTitle === "") {
+      listBooks(browseOffset);
+    } else {
+      searchBook(inputTitle, browseOffset);
+    }
+    // redrawSearchField();
     moveDot(4, 24 + inputTitle.length);
 
     return;
