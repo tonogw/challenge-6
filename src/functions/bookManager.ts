@@ -3,37 +3,30 @@
 import { Book, ScreenField } from "../types";
 import { books } from "../data/books";
 import { moveDot } from "../types";
+import * as fs from "node:fs";
+import * as path from "node:path";
 
 // Fungsi addBook
 // Fungsi ini digunakan untuk menambahkan buku baru ke dalam koleksi
 // Parameter yang dibutuhkan: data buku sesuai tipe Book
 // Fungsi ini tidak mengembalikan nilai (void)
 // Petunjuk: pikirkan bagaimana cara menambahkan buku ke array yang sudah disediakan
+
 export function addBook(book: Book): void {
   books.push(book);
-}
 
-// export function clearResultArea(): void {
-//   for(let resultRow =7; resultRow <=19; resultRow++) {
-//     moveDot(resultRow, 1);
-//     process.stdout.write(" ".repeat(80));
-//   }
-// }
+  appendBookToFile(book);
+}
 
 export function clearResultArea(): void {
   for (let row = 7; row <= 19; row++) {
     moveDot(row, 1);
-
     process.stdout.write(" ".repeat(80));
   }
 }
 
 // List Books Header
 function renderBookHeader(): void {
-  // moveDot(7, 1);
-  // process.stdout.write("BOOK TITLE".padEnd(48) + "AUTHOR".padEnd(27) + "YEAR");
-  // moveDot(8, 1);
-  // process.stdout.write(" ".repeat(80));
   drawBookHeader();
 }
 
@@ -60,21 +53,6 @@ function showNoMatch(): void {
 export function listBooks(): void {
   renderBookHeader();
   renderBookRows(books);
-
-  // moveDot(7, 1);
-  // process.stdout.write("BOOK TITLE".padEnd(48) + "AUTHOR".padEnd(27) + "YEAR");
-
-  // moveDot(8, 1);
-  // process.stdout.write("_".repeat(80));
-  // books.forEach((book, index) => {
-
-  // moveDot(9 + index, 1);
-
-  // process.stdout.write(
-  //   "\x1b[32m" +
-  //     `${book.title.padEnd(45)} | ${book.author.padEnd(25)} | ${book.publicationYear}` +
-  //     "\x1b[37m",
-  // );
 }
 
 // Fungsi searchBook
@@ -85,7 +63,6 @@ export function listBooks(): void {
 //           jika tidak diberikan, tampilkan semua buku atau berikan informasi yang sesuai
 export function searchBook(title?: string): void {
   if (!title?.trim()) {
-    // console.log("Search title is required");
     moveDot(9, 1);
     process.stdout.write("\x1b[32m");
     listBooks();
@@ -98,26 +75,11 @@ export function searchBook(title?: string): void {
 
   if (result.length === 0) {
     showNoMatch();
-
     return;
   }
 
   renderBookHeader();
-  // moveDot(7, 1);
-  // process.stdout.write(
-  //   "BOOK TITLE".padEnd(48) + "AUTHOR".padEnd(27) + "YEAR",
-  // );
-  // moveDot(8, 1);
-  // process.stdout.write("-".repeat(80));
-
-  // result.forEach((book, index) => {
   renderBookRows(result);
-  // moveDot(9 + index, 1);
-  // process.stdout.write(
-  //   "\x1b[32m" +
-  //     `${book.title.padEnd(45)} | ${book.author.padEnd(25)} | ${book.publicationYear}` +
-  //     "\x1b[37m",
-  // );
 }
 
 // Utilites
@@ -128,7 +90,6 @@ export function clearScreen(): void {
 
 // ScreenName
 // untuk membuat display screen
-
 const layoutHeader: ScreenField[] = [
   // Header
   { row: 1, col: 1, text: "©TONOGW" },
@@ -173,9 +134,9 @@ const layoutAdd: ScreenField[] = [
   { row: 4, col: 38, text: "ADD BOOK" },
   { row: 5, col: 25, text: "_".repeat(29) },
 
-  { row: 7, col: 25, text: "Book Title . . . . :" },
-  { row: 8, col: 25, text: "Author Name  . . . : " },
-  { row: 9, col: 25, text: "Publication Year . : " },
+  { row: 7, col: 1, text: "Book Title . . . . :" },
+  { row: 8, col: 1, text: "Author Name  . . . : " },
+  { row: 9, col: 1, text: "Publication Year . : " },
 ];
 
 const layoutHelp: ScreenField[] = [
@@ -196,7 +157,7 @@ const layoutBookHeader: ScreenField[] = [
   { row: 7, col: 1, text: "BOOK TITLE" },
   { row: 7, col: 49, text: "AUTHOR" },
   { row: 7, col: 77, text: "YEAR" },
-  { row: 8, col: 1, text: "_".repeat(80) },
+  { row: 8, col: 1, text: "-".repeat(80) },
 ];
 
 export function drawFields(fields: ScreenField[]): void {
@@ -250,4 +211,24 @@ export function drawHelp(): void {
 // drawBookHeader()
 export function drawBookHeader(): void {
   drawFields(layoutBookHeader);
+}
+
+// ===============
+// Add book
+// ===============
+function appendBookToFile(book: Book): void {
+  const filePath = path.join(process.cwd(), "src/data/books.ts");
+
+  let content = fs.readFileSync(filePath, "utf-8");
+
+  const newRecord = `{
+  title: "${book.title}",
+  author: "${book.author.trim()}",
+  publicationYear: ${book.publicationYear}
+  }
+];`;
+
+  content = content.replace(/\];\s*$/, newRecord);
+
+  fs.writeFileSync(filePath, content, "utf-8");
 }

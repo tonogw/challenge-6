@@ -15,30 +15,22 @@ import { books } from "./data/books";
 // Mulai pengujian di bawah ini
 // import * as readline from "node:readline";
 
-import { moveDot } from "./types";
-import { clearScreen } from "./functions/bookManager";
-import { drawMenu } from "./functions/bookManager";
-import { drawInquiry } from "./functions/bookManager";
-import { drawAdd } from "./functions/bookManager";
-import { drawHelp } from "./functions/bookManager";
-import { clearResultArea } from "./functions/bookManager";
-// process.stdin.on("data", (key: string) => {
-//   console.log(JSON.stringify(key));
-// });
+import { ScreenField, moveDot, AddScreenField } from "./types";
 
-import { addBook, listBooks, searchBook } from "./functions/bookManager";
-
-// const rl = readline;
-
-// Clear screen
-
-// Move cursor
-// function moveDot(row: number, col: number): void {
-//   process.stdout.write(`\x1b[${row};${col}H`);
-// }
+import {
+  addBook,
+  listBooks,
+  searchBook,
+  clearScreen,
+  drawMenu,
+  drawInquiry,
+  drawAdd,
+  drawHelp,
+  clearResultArea,
+} from "./functions/bookManager";
+import { moveCursor } from "node:readline";
 
 // Draw screen
-
 drawMenu();
 let currentScreen = "MENU";
 
@@ -49,30 +41,24 @@ process.stdin.setEncoding("utf8");
 let inputTitle = "";
 
 process.stdin.on("data", (key: string) => {
-  // debug(JSON.stringify(key));
   if (handleFunctionKey(key)) {
     return;
   }
 
   switch (currentScreen) {
     case "MENU":
-      // if (currentScreen === "MENU") {
-      handleMenuInput(key);
+      handleMenuSelection(key);
       break;
 
     case "INQUIRY":
-      // if (currentScreen === "INQUIRY") {
       handleSearchInput(key);
       break;
 
     case "ADD":
-      // if (currentScreen === "ADD") {
       handleAddInput(key);
       break;
 
     case "HELP":
-      // if (currentScreen === "HELP") {
-
       break;
   }
 });
@@ -89,7 +75,7 @@ function handleFunctionKey(key: string): boolean {
   // F2
   if (key === "\u001bOQ") {
     currentScreen = "MENU";
-    // clearScreen();
+
     menuSelection = "";
     drawMenu();
     return true;
@@ -98,55 +84,35 @@ function handleFunctionKey(key: string): boolean {
   // F3
   if (key === "\u001bOR") {
     currentScreen = "INQUIRY";
-    // clearScreen();
+
     inputTitle = "";
     drawInquiry();
     return true;
   }
 
-  // F4 exit || Crtl+C
-  // if (key === "\u0003") {
-  //   clearScreen();
-  //   process.exit();
-
   return false;
 }
 
-function handleMenuInput(key: string): void {
-  // moveDot(22, 1);
-  // debug(`KEY=[${JSON.stringify(key)}]`);
-
+function handleMenuSelection(key: string): void {
   // Typing
   if ("1234".includes(key)) {
     menuSelection = key;
     moveDot(13, 43);
     process.stdout.write("\x1b[32m" + key + "\x1b[37m");
 
-    // debug(`MENU KEY=[${key}] |  ${currentScreen} | ${menuSelection}`);
-
     return;
   }
-
-  // Backspace
-  // if (key === "\u007f") {
-  //   menuSelection = "";
-  //   moveDot(13, 43);
-  //   process.stdout.write("_");
-  //   return;
-  // }
 
   // ENTER only
   if (key !== "\r") {
     return;
-    // console.log(currentScreen);
-    // console.log(menuSelection);
   }
 
   switch (menuSelection) {
     case "1":
       currentScreen = "INQUIRY";
       inputTitle = "";
-      // clearScreen();
+
       drawInquiry();
       moveDot(4, 24);
 
@@ -154,19 +120,18 @@ function handleMenuInput(key: string): void {
 
     case "2":
       currentScreen = "ADD";
-      // clearScreen();
+
       drawAdd();
 
       break;
 
     case "3":
       currentScreen = "HELP";
-      // clearScreen();
+
       drawHelp();
       break;
 
     case "4":
-      // currentScreen = "MENU";
       clearScreen();
       process.exit();
   }
@@ -176,10 +141,7 @@ function handleMenuInput(key: string): void {
 
 function redrawSearchField(): void {
   moveDot(4, 24);
-  process.stdout.write("\x1b[32m" + inputTitle.padEnd(40) + "\x1b[37m");
-
-  // moveDot(4, 24);
-  // process.stdout.write("\x1b[32m" + inputTitle + "\x1b[37m");
+  process.stdout.write("\x1b[32m" + inputTitle.padEnd(57) + "\x1b[37m");
 
   moveDot(4, 24 + inputTitle.length);
 }
@@ -194,11 +156,6 @@ function handleSearchInput(key: string): void {
     } else {
       searchBook(inputTitle);
     }
-    //
-
-    // moveDot(4, 24);
-    // process.stdout.write(inputTitle);
-
     moveDot(4, 24 + inputTitle.length);
 
     return;
@@ -206,28 +163,23 @@ function handleSearchInput(key: string): void {
 
   // Backspace
   if (key === "\u007f") {
-    //   clearResultArea();
-
-    //   // moveDot(9, 1);
-
-    if (inputTitle.length > 0) {
-      //   // currentScreen = "SEARCH";
-      //   // clearScreen();
-      //   // drawListScreen();
-      //   // moveDot(8, 1);
-      //   // listBooks();
+    if (inputTitle.length > 0 || inputTitle.length <= 57) {
       inputTitle = inputTitle.slice(0, -1);
-      // searchBook(inputTitle);
+
       redrawSearchField();
     }
-    //   moveDot(4, 24 + inputTitle.length);
-    // moveDot(9, 1);
-    // process.stdout.write(": " + inputTitle.length);
 
     return;
   }
 
   // Normal typing
+  if (key.length > 1) {
+    return;
+  }
+
+  if (inputTitle.length >= 57) {
+    return;
+  }
   inputTitle += key;
 
   process.stdout.write("\x1b[32m" + key + "\x1b[37m");
@@ -239,13 +191,123 @@ function handleListInput(key: string): void {
 }
 
 function handleAddInput(key: string): void {
-  return;
+  // ENTER
+  if (key === "\u007f") {
+    switch (addField) {
+      case "ADD_TITLE":
+        addTitle = addTitle.slice(0, -1);
+        break;
+
+      case "ADD_AUTHOR":
+        addAuthor = addAuthor.slice(0, -1);
+        break;
+
+      case "ADD_YEAR":
+        addYear = addYear.slice(0, -1);
+        break;
+    }
+
+    redrawAddField();
+    return;
+  }
+
+  // ENTER
+  if (key === "\r") {
+    switch (addField) {
+      case "ADD_TITLE":
+        addField = "ADD_AUTHOR";
+        break;
+
+      case "ADD_AUTHOR":
+        addField = "ADD_YEAR";
+        break;
+
+      case "ADD_YEAR":
+        addBook({
+          title: addTitle,
+          author: addAuthor,
+          publicationYear: Number(addYear),
+        });
+
+        addTitle = "";
+        addAuthor = "";
+        addYear = "";
+
+        addField = "ADD_TITLE";
+
+        break;
+
+      // redrawAddField();
+      // return;
+    }
+  }
+
+  // NORMAL TYPING
+  switch (addField) {
+    case "ADD_TITLE":
+      addTitle += key;
+      break;
+
+    case "ADD_AUTHOR":
+      addAuthor += key;
+      break;
+
+    case "ADD_YEAR":
+      if ("0123456789".includes(key)) {
+        addYear += key;
+      }
+      break;
+  }
+
+  redrawAddField();
 }
 
 let menuSelection = "";
 
-// function debug(message: string): void {
-//   moveDot(21, 1);
-//   process.stdout.write(message.padEnd(80));
+// =================
+// Add book
+// =================
+let addTitle = "";
+let addAuthor = "";
+let addYear = "";
+
+let fieldIndex = "";
+
+let addField: AddScreenField = "ADD_TITLE";
+
+// if (addField === "ADD_TITLE") {
+//   addField = "ADD_AUTHOR";
+// } else if (addField === "ADD_AUTHOR") {
+//   addField = "ADD_YEAR";
 // }
-// debug(`MENU KEY=${key} | | ${currentScreen} | ${menuSelection}`);
+
+// addField = "ADD_TITLE";
+
+function redrawAddField(): void {
+  moveDot(7, 24);
+  process.stdout.write("\x1b[32m" + addTitle.padEnd(40) + "\x1b[37m");
+
+  moveDot(8, 24);
+  process.stdout.write("\x1b[32m" + addAuthor.padEnd(40) + "\x1b[37m");
+
+  moveDot(9, 24);
+  process.stdout.write("\x1b[32m" + addYear.padEnd(4) + "\x1b[37m");
+
+  moveCursorToActiveField();
+}
+
+function moveCursorToActiveField(): void {
+  switch (addField) {
+    case "ADD_TITLE":
+      moveDot(7, 24 + addTitle.length);
+      break;
+
+    case "ADD_AUTHOR":
+      moveDot(8, 24 + addAuthor.length);
+      break;
+
+    case "ADD_YEAR":
+      moveDot(9, 24 + addYear.length);
+      break;
+  }
+}

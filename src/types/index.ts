@@ -28,3 +28,5 @@ export interface AppState {
   inputTitle: string;
   currentPage: number;
 }
+
+export type AddScreenField = "ADD_TITLE" | "ADD_AUTHOR" | "ADD_YEAR";

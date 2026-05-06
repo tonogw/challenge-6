@@ -19,4 +19,9 @@ export const books: Book[] = [
     author: "Eric Evans",
     publicationYear: 2003,
   },
+{
+  title: "Modular Design Utility Management System",
+  author: "Gunarto Wibisono",
+  publicationYear: 2025
+  }
 ];
