@@ -33,9 +33,14 @@ function renderBookHeader(): void {
 function renderBookRows(records: Book[]): void {
   records.forEach((book, index) => {
     moveDot(9 + index, 1);
+    // process.stdout.write(
+    //   "\x1b[32m" +
+    //     `${book.title.padEnd(45)} | ${book.author.padEnd(25)} | ${book.publicationYear}` +
+    //     "\x1b[37m",
+    // );
     process.stdout.write(
       "\x1b[32m" +
-        `${book.title.padEnd(45)} | ${book.author.padEnd(25)} | ${book.publicationYear}` +
+        `${book.title.slice(0, 45).padEnd(45)} | ${book.author.slice(0, 25).padEnd(25)} | ${book.publicationYear}` +
         "\x1b[37m",
     );
   });
@@ -45,6 +50,7 @@ function showNoMatch(): void {
   moveDot(9, 27);
   process.stdout.write("\x1b[31m" + "*** NO MATCHING RECORD ***" + "\x1b[37m");
 }
+
 // Fungsi listBooks
 // Fungsi ini digunakan untuk menampilkan semua buku yang tersimpan
 // Tidak memerlukan parameter
@@ -222,10 +228,10 @@ function appendBookToFile(book: Book): void {
   let content = fs.readFileSync(filePath, "utf-8");
 
   const newRecord = `{
-  title: "${book.title}",
+  title: "${book.title.trim()}",
   author: "${book.author.trim()}",
-  publicationYear: ${book.publicationYear}
-  }
+  publicationYear: ${book.publicationYear},
+  },
 ];`;
 
   content = content.replace(/\];\s*$/, newRecord);

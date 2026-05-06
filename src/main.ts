@@ -207,7 +207,7 @@ function handleAddInput(key: string): void {
         break;
     }
 
-    redrawAddField();
+    refreshAddScreen();
     return;
   }
 
@@ -220,6 +220,7 @@ function handleAddInput(key: string): void {
 
       case "ADD_AUTHOR":
         addField = "ADD_YEAR";
+        refreshAddScreen();
         break;
 
       case "ADD_YEAR":
@@ -234,7 +235,7 @@ function handleAddInput(key: string): void {
         addYear = "";
 
         addField = "ADD_TITLE";
-
+        refreshAddScreen();
         break;
 
       // redrawAddField();
@@ -294,6 +295,11 @@ function redrawAddField(): void {
   process.stdout.write("\x1b[32m" + addYear.padEnd(4) + "\x1b[37m");
 
   moveCursorToActiveField();
+}
+
+function refreshAddScreen(): void {
+  drawAdd();
+  redrawAddField();
 }
 
 function moveCursorToActiveField(): void {
