@@ -3,30 +3,3 @@
 // Petunjuk: gunakan type alias atau interface untuk mendefinisikan struktur data ini
 // Pastikan tipe data untuk setiap properti sudah sesuai dengan kebutuhan
 
-// export {}; // Biar TypeScript anggap file ini "modul" sendiri (ga bentrok nama variabel antar file)
-export interface Book {
-  title: string;
-  author: string;
-  publicationYear: number;
-}
-
-export function moveDot(row: number, col: number): void {
-  process.stdout.write(`\x1b[${row};${col}H`);
-}
-
-export interface ScreenField {
-  row: number;
-  col: number;
-  text: string;
-}
-
-export type ScreenName = "MENU" | "INQUIRY" | "ADD" | "HELP";
-
-export interface AppState {
-  currentScreen: ScreenName;
-  menuSelection: string;
-  inputTitle: string;
-  currentPage: number;
-}
-
-export type AddScreenField = "ADD_TITLE" | "ADD_AUTHOR" | "ADD_YEAR";
