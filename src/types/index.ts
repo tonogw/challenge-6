@@ -3,6 +3,7 @@
 // Petunjuk: gunakan type alias atau interface untuk mendefinisikan struktur data ini
 // Pastikan tipe data untuk setiap properti sudah sesuai dengan kebutuhan
 
+// TYPE DATA OF BOOK
 export type Book = {
   title: string;
   author: string;
